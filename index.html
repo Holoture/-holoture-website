@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holoture — AI-Powered Investment Insights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0D0F1A;
+    --navy2: #161929;
+    --navy3: #1E2235;
+    --teal: #00D4AA;
+    --teal-dim: #00A888;
+    --teal-glow: rgba(0,212,170,0.12);
+    --gold: #F5C842;
+    --red-sig: #FF4D6D;
+    --text: #E8EAF0;
+    --muted: #8892A4;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(0,212,170,0.2);
+    --card: rgba(255,255,255,0.04);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 68px;
+    background: rgba(13,15,26,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px; color: var(--text); letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--teal); }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .btn-nav {
+    background: var(--teal); color: var(--navy); padding: 9px 22px;
+    border-radius: 8px; font-size: 14px; font-weight: 600; border: none;
+    cursor: pointer; text-decoration: none; transition: background 0.2s, transform 0.15s;
+  }
+  .btn-nav:hover { background: #00bfa0; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    padding: 160px 48px 100px;
+    max-width: 1200px; margin: 0 auto;
+    position: relative;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--teal-glow); border: 1px solid var(--border2);
+    color: var(--teal); font-size: 12px; font-weight: 600; letter-spacing: 1px;
+    padding: 6px 14px; border-radius: 100px; margin-bottom: 32px;
+    font-family: 'Space Mono', monospace;
+  }
+  .hero-tag::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(48px, 6vw, 80px);
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--text);
+    max-width: 800px;
+    margin-bottom: 28px;
+  }
+  h1 em { color: var(--teal); font-style: normal; }
+  .hero-sub {
+    font-size: 19px; color: var(--muted); max-width: 560px;
+    line-height: 1.65; margin-bottom: 48px; font-weight: 300;
+  }
+  .hero-cta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--teal); color: var(--navy);
+    padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 600;
+    border: none; cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #00bfa0; transform: translateY(-2px); }
+  .btn-ghost {
+    background: transparent; color: var(--text);
+    padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 500;
+    border: 1px solid var(--border); cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: var(--card); }
+  .hero-note { font-size: 13px; color: var(--muted); margin-top: 16px; }
+
+  /* TICKER STRIP */
+  .ticker-wrap {
+    background: var(--navy2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    overflow: hidden; padding: 12px 0; margin-bottom: 0;
+  }
+  .ticker-track {
+    display: flex; gap: 48px; animation: scroll 22s linear infinite; width: max-content;
+  }
+  @keyframes scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .tick {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Space Mono', monospace; font-size: 13px; white-space: nowrap;
+  }
+  .tick-sym { color: var(--text); font-weight: 700; }
+  .tick-up { color: var(--teal); }
+  .tick-down { color: var(--red-sig); }
+
+  /* SIGNAL CARD (HERO VISUAL) */
+  .hero-visual {
+    position: absolute; right: 48px; top: 160px;
+    width: 340px;
+    display: none;
+  }
+  @media(min-width:1100px){ .hero-visual { display: block; } }
+
+  .signal-card {
+    background: var(--navy2); border: 1px solid var(--border2);
+    border-radius: 16px; padding: 24px; position: relative; overflow: hidden;
+  }
+  .signal-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  }
+  .sig-label {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    color: var(--teal); margin-bottom: 16px; text-transform: uppercase;
+  }
+  .sig-ticker {
+    font-family: 'DM Serif Display', serif; font-size: 36px;
+    color: var(--text); letter-spacing: -1px;
+  }
+  .sig-company { color: var(--muted); font-size: 14px; margin-bottom: 20px; margin-top: 4px; }
+  .sig-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .sig-key { font-size: 12px; color: var(--muted); }
+  .sig-val { font-size: 13px; font-weight: 600; font-family: 'Space Mono', monospace; }
+  .sig-val.up { color: var(--teal); }
+  .sig-val.gold { color: var(--gold); }
+  .sig-bar-wrap { margin-top: 20px; }
+  .sig-bar-label { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .sig-bar-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; }
+  .sig-bar-fill { height: 6px; background: var(--teal); border-radius: 3px; width: 72%; }
+  .sig-badge {
+    margin-top: 20px; display: inline-block;
+    background: rgba(0,212,170,0.12); border: 1px solid var(--border2);
+    color: var(--teal); font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    padding: 5px 12px; border-radius: 6px; font-family: 'Space Mono', monospace;
+  }
+  .sig-time { font-size: 11px; color: var(--muted); margin-top: 10px; font-family: 'Space Mono', monospace; }
+
+  /* SECTIONS */
+  section { padding: 96px 48px; max-width: 1200px; margin: 0 auto; }
+  .section-tag {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+    color: var(--teal); text-transform: uppercase; margin-bottom: 16px;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif; font-size: clamp(36px, 4vw, 52px);
+    letter-spacing: -1.5px; line-height: 1.1; color: var(--text); margin-bottom: 20px;
+  }
+  h2 em { color: var(--teal); font-style: normal; }
+  .section-sub { font-size: 17px; color: var(--muted); max-width: 560px; font-weight: 300; }
+
+  /* HOW IT WORKS */
+  .steps-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px; margin-top: 64px;
+  }
+  .step-card {
+    background: var(--navy2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px 28px;
+    transition: border-color 0.3s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .step-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+  .step-num {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+    color: var(--teal); margin-bottom: 20px;
+  }
+  .step-icon {
+    font-size: 28px; margin-bottom: 16px; display: block;
+  }
+  .step-card h3 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); margin-bottom: 12px; }
+  .step-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  /* SIGNALS PREVIEW */
+  .signals-wrap { margin-top: 64px; }
+  .signals-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    padding: 6px 16px; border-radius: 100px; font-size: 13px; font-weight: 500;
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .pill.active { background: var(--teal-glow); border-color: var(--border2); color: var(--teal); }
+  .signals-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .sig-mini {
+    background: var(--navy2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 22px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+  }
+  .sig-mini:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .sig-mini.locked::after {
+    content: '🔒 Pro'; position: absolute; inset: 0;
+    background: rgba(13,15,26,0.88); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; color: var(--muted);
+    font-family: 'Space Mono', monospace; letter-spacing: 1px;
+    backdrop-filter: blur(2px);
+  }
+  .sm-left .sm-sym {
+    font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text);
+  }
+  .sm-left .sm-name { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .sm-right { text-align: right; }
+  .sm-signal {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; font-family: 'Space Mono', monospace;
+    padding: 3px 8px; border-radius: 4px; margin-bottom: 6px; display: inline-block;
+  }
+  .sm-signal.buy { background: rgba(0,212,170,0.15); color: var(--teal); }
+  .sm-signal.watch { background: rgba(245,200,66,0.15); color: var(--gold); }
+  .sm-signal.short { background: rgba(255,77,109,0.15); color: var(--red-sig); }
+  .sm-conf { font-size: 12px; color: var(--muted); }
+  .sm-conf span { color: var(--text); font-weight: 600; }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px; margin-top: 64px; max-width: 760px;
+  }
+  .price-card {
+    background: var(--navy2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px 32px;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .price-card.featured {
+    border-color: var(--teal);
+    background: linear-gradient(135deg, rgba(0,212,170,0.06), var(--navy2));
+  }
+  .price-badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--teal); color: var(--navy); font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; padding: 4px 16px; border-radius: 100px;
+    font-family: 'Space Mono', monospace;
+  }
+  .price-tier { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .price-num {
+    font-family: 'DM Serif Display', serif; font-size: 52px; color: var(--text); line-height: 1;
+  }
+  .price-num sup { font-size: 24px; vertical-align: top; margin-top: 8px; display: inline-block; }
+  .price-period { font-size: 14px; color: var(--muted); margin-top: 4px; margin-bottom: 28px; }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .price-features li {
+    font-size: 14px; color: var(--muted); display: flex; align-items: center; gap: 10px;
+  }
+  .price-features li::before { content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+  .price-features li.dim::before { content: '–'; color: rgba(255,255,255,0.2); }
+  .price-features li.dim { opacity: 0.4; }
+  .btn-price {
+    width: 100%; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-price.free { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+  .btn-price.free:hover { border-color: rgba(255,255,255,0.2); }
+  .btn-price.pro { background: var(--teal); color: var(--navy); }
+  .btn-price.pro:hover { background: #00bfa0; }
+
+  /* DASHBOARD PREVIEW */
+  .dash-wrap {
+    margin-top: 64px;
+    background: var(--navy2); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+  }
+  .dash-header {
+    background: var(--navy3); border-bottom: 1px solid var(--border);
+    padding: 16px 24px; display: flex; align-items: center; gap: 16px;
+  }
+  .dash-dots { display: flex; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #FF5F57; }
+  .dot.y { background: #FEBC2E; }
+  .dot.g { background: #28C840; }
+  .dash-url {
+    flex: 1; background: rgba(255,255,255,0.05); border-radius: 6px;
+    padding: 6px 14px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted);
+  }
+  .dash-body { display: flex; min-height: 500px; }
+  .dash-sidebar {
+    width: 200px; flex-shrink: 0; border-right: 1px solid var(--border);
+    padding: 24px 16px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .dash-logo { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); padding: 0 10px 20px; }
+  .dash-logo span { color: var(--teal); }
+  .dash-nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
+    font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.15s;
+  }
+  .dash-nav-item:hover, .dash-nav-item.active { background: rgba(0,212,170,0.08); color: var(--teal); }
+  .dash-content { flex: 1; padding: 28px; overflow: hidden; }
+  .dash-greeting { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); margin-bottom: 6px; }
+  .dash-date { font-size: 13px; color: var(--muted); margin-bottom: 28px; font-family: 'Space Mono', monospace; }
+  .dash-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-box {
+    background: var(--navy3); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+  }
+  .stat-box .label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .stat-box .val { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--text); }
+  .stat-box .val.up { color: var(--teal); }
+  .stat-box .val.down { color: var(--red-sig); }
+  .stat-box .sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .picks-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-family: 'Space Mono', monospace; }
+  .pick-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--navy3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 8px;
+  }
+  .pick-sym { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); }
+  .pick-name { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .pick-mid { text-align: center; }
+  .pick-horizon { font-size: 11px; color: var(--muted); }
+  .pick-score { font-family: 'Space Mono', monospace; font-size: 13px; }
+  .score-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 4px; width: 80px; }
+  .score-fill { height: 4px; border-radius: 2px; background: var(--teal); }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    border-top: 1px solid var(--border);
+    padding: 48px;
+    text-align: center;
+  }
+  .disclaimer p { font-size: 12px; color: var(--muted); max-width: 700px; margin: 0 auto; line-height: 1.8; }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy2); border-top: 1px solid var(--border);
+    padding: 64px 48px 32px;
+    max-width: 100%;
+  }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-top { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+  .footer-brand .logo { display: block; margin-bottom: 12px; }
+  .footer-brand p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .footer-col h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+  .footer-col a { display: block; font-size: 13px; color: var(--muted); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+  .footer-col a:hover { color: var(--teal); }
+  .footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; }
+  .footer-bottom p { font-size: 12px; color: var(--muted); }
+
+  @media(max-width:768px){
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 120px 20px 80px; }
+    section { padding: 64px 20px; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    footer { padding: 48px 20px 24px; }
+    .disclaimer { padding: 32px 20px; }
+    .dash-sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Holo<span>ture</span></div>
+  <div class="nav-links">
+    <a href="#how">How It Works</a>
+    <a href="#signals">Signals</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#app">Dashboard</a>
+  </div>
+  <a href="#pricing" class="btn-nav">Get Started Free</a>
+</nav>
+
+<!-- HERO -->
+<div style="padding-top: 68px; position: relative;">
+  <section class="hero" style="padding-top:96px; padding-bottom:80px; max-width:1200px; margin:0 auto; position:relative;">
+
+    <div class="hero-tag">AI SIGNAL ENGINE · LIVE</div>
+
+    <h1>Stock signals,<br><em>powered by AI.</em><br>Not a guru.</h1>
+    <p class="hero-sub">Holoture delivers transparent, AI-generated investment signals every day — no overpriced courses, no pump-and-dump Discord, no BS. Just data.</p>
+
+    <div class="hero-cta">
+      <a href="#pricing" class="btn-primary">Start for Free</a>
+      <a href="#signals" class="btn-ghost">See Today's Signals</a>
+    </div>
+    <p class="hero-note">No credit card required · Free tier always available · Not financial advice</p>
+
+    <!-- Floating signal card -->
+    <div class="hero-visual">
+      <div class="signal-card">
+        <div class="sig-label">AI SIGNAL · TODAY</div>
+        <div class="sig-ticker">NVDA</div>
+        <div class="sig-company">NVIDIA Corporation</div>
+        <div class="sig-row">
+          <span class="sig-key">Signal Type</span>
+          <span class="sig-val up">BUY</span>
+        </div>
+        <div class="sig-row">
+          <span class="sig-key">Entry Zone</span>
+          <span class="sig-val">$118 – $122</span>
+        </div>
+        <div class="sig-row">
+          <span class="sig-key">Time Horizon</span>
+          <span class="sig-val">2–4 weeks</span>
+        </div>
+        <div class="sig-row">
+          <span class="sig-key">AI Confidence</span>
+          <span class="sig-val gold">72%</span>
+        </div>
+        <div class="sig-bar-wrap">
+          <div class="sig-bar-label">
+            <span>Confidence Score</span>
+            <span style="color:var(--gold)">72 / 100</span>
+          </div>
+          <div class="sig-bar-track">
+            <div class="sig-bar-fill" style="width:72%; background:var(--gold)"></div>
+          </div>
+        </div>
+        <div class="sig-badge">↑ MOMENTUM · SECTOR TAILWIND</div>
+        <div class="sig-time">Generated: Mon May 18, 2026 · 06:30 EST</div>
+      </div>
+
+      <div style="margin-top:12px; background:var(--navy2); border:1px solid var(--border); border-radius:12px; padding:14px 20px; font-size:12px; color:var(--muted); line-height:1.6;">
+        AI-generated for informational purposes only. Not personalized investment advice. Past signal performance does not guarantee future results.
+      </div>
+    </div>
+
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <div class="tick"><span class="tick-sym">AAPL</span><span class="tick-up">+1.4%</span></div>
+      <div class="tick"><span class="tick-sym">NVDA</span><span class="tick-up">+3.2%</span></div>
+      <div class="tick"><span class="tick-sym">MSFT</span><span class="tick-up">+0.8%</span></div>
+      <div class="tick"><span class="tick-sym">TSLA</span><span class="tick-down">-2.1%</span></div>
+      <div class="tick"><span class="tick-sym">META</span><span class="tick-up">+1.9%</span></div>
+      <div class="tick"><span class="tick-sym">AMZN</span><span class="tick-up">+0.6%</span></div>
+      <div class="tick"><span class="tick-sym">GOOGL</span><span class="tick-down">-0.4%</span></div>
+      <div class="tick"><span class="tick-sym">AMD</span><span class="tick-up">+2.7%</span></div>
+      <div class="tick"><span class="tick-sym">NFLX</span><span class="tick-up">+1.1%</span></div>
+      <div class="tick"><span class="tick-sym">SPY</span><span class="tick-up">+0.5%</span></div>
+      <div class="tick"><span class="tick-sym">QQQ</span><span class="tick-up">+0.9%</span></div>
+      <div class="tick"><span class="tick-sym">JPM</span><span class="tick-down">-0.3%</span></div>
+      <div class="tick"><span class="tick-sym">AAPL</span><span class="tick-up">+1.4%</span></div>
+      <div class="tick"><span class="tick-sym">NVDA</span><span class="tick-up">+3.2%</span></div>
+      <div class="tick"><span class="tick-sym">MSFT</span><span class="tick-up">+0.8%</span></div>
+      <div class="tick"><span class="tick-sym">TSLA</span><span class="tick-down">-2.1%</span></div>
+      <div class="tick"><span class="tick-sym">META</span><span class="tick-up">+1.9%</span></div>
+      <div class="tick"><span class="tick-sym">AMZN</span><span class="tick-up">+0.6%</span></div>
+      <div class="tick"><span class="tick-sym">GOOGL</span><span class="tick-down">-0.4%</span></div>
+      <div class="tick"><span class="tick-sym">AMD</span><span class="tick-up">+2.7%</span></div>
+      <div class="tick"><span class="tick-sym">NFLX</span><span class="tick-up">+1.1%</span></div>
+      <div class="tick"><span class="tick-sym">SPY</span><span class="tick-up">+0.5%</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-tag">HOW IT WORKS</div>
+  <h2>Signals built on <em>data,</em><br>not hype.</h2>
+  <p class="section-sub">Our AI engine analyzes thousands of market signals every day so you don't have to.</p>
+
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">STEP 01</div>
+      <div class="step-icon">📡</div>
+      <h3>Market Data Ingested</h3>
+      <p>Every morning, our AI pulls price action, volume, RSI, MACD, earnings dates, and sector news from live market feeds.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 02</div>
+      <div class="step-icon">🧠</div>
+      <h3>AI Scores & Ranks</h3>
+      <p>Claude-powered models evaluate each stock across 40+ indicators and assign a confidence score. Low-conviction picks are filtered out.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 03</div>
+      <div class="step-icon">📊</div>
+      <h3>Curated Signals Delivered</h3>
+      <p>Free users get one randomized pick. Pro users get the full ranked list with entry zones, time horizons, and detailed breakdowns.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">STEP 04</div>
+      <div class="step-icon">🔁</div>
+      <h3>You Decide. Always.</h3>
+      <p>Every signal is clearly labeled AI-generated insight — not advice. You stay in control of every investment decision you make.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNALS SECTION -->
+<div style="background: var(--navy2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+<section id="signals" style="padding-top:80px; padding-bottom:80px;">
+  <div class="section-tag">TODAY'S SIGNALS</div>
+  <h2>What the AI sees <em>today.</em></h2>
+  <p class="section-sub">Free users get one daily pick. Pro unlocks the full board.</p>
+
+  <div class="signals-wrap">
+    <div class="signals-header">
+      <div class="filter-pills">
+        <button class="pill active">All</button>
+        <button class="pill">Tech</button>
+        <button class="pill">Energy</button>
+        <button class="pill">Healthcare</button>
+        <button class="pill">Finance</button>
+      </div>
+      <div style="font-family:'Space Mono',monospace; font-size:11px; color:var(--muted);">Updated: 06:30 EST · Mon May 18</div>
+    </div>
+
+    <div class="signals-grid">
+      <!-- FREE PICK -->
+      <div class="sig-mini">
+        <div class="sm-left">
+          <div class="sm-sym">NVDA</div>
+          <div class="sm-name">NVIDIA Corp</div>
+        </div>
+        <div class="sm-right">
+          <div class="sm-signal buy">BUY</div>
+          <div class="sm-conf">Confidence <span>72%</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">2–4 weeks</div>
+        </div>
+      </div>
+      <!-- LOCKED PRO -->
+      <div class="sig-mini locked">
+        <div class="sm-left">
+          <div class="sm-sym">AMZN</div>
+          <div class="sm-name">Amazon</div>
+        </div>
+        <div class="sm-right">
+          <div class="sm-signal buy">BUY</div>
+          <div class="sm-conf">Confidence <span>81%</span></div>
+        </div>
+      </div>
+      <div class="sig-mini locked">
+        <div class="sm-left">
+          <div class="sm-sym">XOM</div>
+          <div class="sm-name">Exxon Mobil</div>
+        </div>
+        <div class="sm-right">
+          <div class="sm-signal watch">WATCH</div>
+          <div class="sm-conf">Confidence <span>58%</span></div>
+        </div>
+      </div>
+      <div class="sig-mini locked">
+        <div class="sm-left">
+          <div class="sm-sym">UNH</div>
+          <div class="sm-name">UnitedHealth</div>
+        </div>
+        <div class="sm-right">
+          <div class="sm-signal buy">BUY</div>
+          <div class="sm-conf">Confidence <span>76%</span></div>
+        </div>
+      </div>
+      <div class="sig-mini locked">
+        <div class="sm-left">
+          <div class="sm-sym">TSLA</div>
+          <div class="sm-name">Tesla Inc</div>
+        </div>
+        <div class="sm-right">
+          <div class="sm-signal short">SHORT</div>
+          <div class="sm-conf">Confidence <span>63%</span></div>
+        </div>
+      </div>
+      <div class="sig-mini locked">
+        <div class="sm-left">
+          <div class="sm-sym">JPM</div>
+          <div class="sm-name">JPMorgan Chase</div>
+        </div>
+        <div class="sm-right">
+          <div class="sm-signal watch">WATCH</div>
+          <div class="sm-conf">Confidence <span>54%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px; padding:16px 20px; background:rgba(0,212,170,0.06); border:1px solid var(--border2); border-radius:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div style="font-size:14px; font-weight:600; color:var(--text);">Unlock all 12 signals today</div>
+        <div style="font-size:13px; color:var(--muted); margin-top:2px;">Pro gives you the full picture — every sector, every day.</div>
+      </div>
+      <a href="#pricing" class="btn-primary" style="font-size:14px; padding:10px 24px;">Go Pro — $15/mo</a>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-tag">PRICING</div>
+  <h2>Simple, honest <em>pricing.</em></h2>
+  <p class="section-sub">No upsells. No hidden "premium tiers." No course you have to buy to understand the picks.</p>
+
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tier">Free</div>
+      <div class="price-num"><sup>$</sup>0</div>
+      <div class="price-period">forever free</div>
+      <ul class="price-features">
+        <li>1 AI stock pick per day (randomized)</li>
+        <li>Basic market overview</li>
+        <li>Community access</li>
+        <li>AI signal glossary & education</li>
+        <li class="dim">Full signal board (12+ picks)</li>
+        <li class="dim">Sector & watchlist filters</li>
+        <li class="dim">Entry/exit zones & confidence scores</li>
+        <li class="dim">Weekly AI digest report</li>
+        <li class="dim">Mobile push alerts</li>
+      </ul>
+      <button class="btn-price free">Create Free Account</button>
+    </div>
+
+    <div class="price-card featured">
+      <div class="price-badge">MOST VALUE</div>
+      <div class="price-tier" style="color:var(--teal)">Pro</div>
+      <div class="price-num"><sup>$</sup>15</div>
+      <div class="price-period">per month · cancel anytime</div>
+      <ul class="price-features">
+        <li>Everything in Free</li>
+        <li>Full signal board (12+ AI picks/day)</li>
+        <li>Sector & market cap filters</li>
+        <li>Entry zones, exit targets & stop-losses</li>
+        <li>AI confidence scores & signal reasoning</li>
+        <li>Personalized watchlist alerts</li>
+        <li>Weekly AI market digest report</li>
+        <li>Mobile app with push notifications</li>
+        <li>Beta access to new AI features</li>
+      </ul>
+      <button class="btn-price pro">Start Pro — $15/mo</button>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; font-size:13px; color:var(--muted);">
+    Annual plan available: <strong style="color:var(--text)">$129/year</strong> — save ~28% · 
+    Early adopters: lock in <strong style="color:var(--teal)">$9.99/mo for life</strong> (first 500 signups)
+  </div>
+</section>
+
+<!-- DASHBOARD PREVIEW -->
+<div style="background:var(--navy2); border-top:1px solid var(--border);">
+<section id="app" style="padding-top:80px; padding-bottom:80px;">
+  <div class="section-tag">APP PREVIEW</div>
+  <h2>Your Pro <em>dashboard.</em></h2>
+  <p class="section-sub">A clean, fast interface designed for everyday investors — not hedge fund traders.</p>
+
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <div class="dash-dots">
+        <div class="dot r"></div>
+        <div class="dot y"></div>
+        <div class="dot g"></div>
+      </div>
+      <div class="dash-url">app.holoture.com/dashboard</div>
+    </div>
+
+    <div class="dash-body">
+      <div class="dash-sidebar">
+        <div class="dash-logo">Holo<span>ture</span></div>
+        <div class="dash-nav-item active">📊 Dashboard</div>
+        <div class="dash-nav-item">📡 All Signals</div>
+        <div class="dash-nav-item">⭐ Watchlist</div>
+        <div class="dash-nav-item">📰 Weekly Digest</div>
+        <div class="dash-nav-item">🔔 Alerts</div>
+        <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--border);">
+          <div class="dash-nav-item">⚙️ Settings</div>
+          <div style="margin: 12px 10px 0; padding:10px; background:rgba(0,212,170,0.06); border:1px solid var(--border2); border-radius:8px;">
+            <div style="font-size:10px; color:var(--teal); font-family:'Space Mono',monospace; margin-bottom:4px;">PRO ACTIVE</div>
+            <div style="font-size:11px; color:var(--muted);">Next billing May 18</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-content">
+        <div class="dash-greeting">Good morning, Alex. 👋</div>
+        <div class="dash-date">MON MAY 18, 2026 · MARKET OPEN IN 1H 12M</div>
+
+        <div class="dash-stats">
+          <div class="stat-box">
+            <div class="label">Signals Today</div>
+            <div class="val">14</div>
+            <div class="sub">↑ 3 from yesterday</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Avg Confidence</div>
+            <div class="val up">68%</div>
+            <div class="sub">Across all sectors</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">30-Day Accuracy</div>
+            <div class="val">71%</div>
+            <div class="sub">Signal hit rate</div>
+          </div>
+        </div>
+
+        <div class="picks-label">TOP SIGNALS · TODAY</div>
+
+        <div class="pick-row">
+          <div>
+            <div class="pick-sym">NVDA</div>
+            <div class="pick-name">NVIDIA Corp · Tech</div>
+          </div>
+          <div class="pick-mid">
+            <div class="sm-signal buy" style="font-size:10px; padding:2px 8px;">BUY</div>
+            <div class="pick-horizon" style="margin-top:4px;">2–4 weeks</div>
+          </div>
+          <div style="text-align:right">
+            <div class="pick-score" style="color:var(--gold)">72%</div>
+            <div class="score-bar"><div class="score-fill" style="width:72%"></div></div>
+          </div>
+        </div>
+
+        <div class="pick-row">
+          <div>
+            <div class="pick-sym">AMZN</div>
+            <div class="pick-name">Amazon · Tech</div>
+          </div>
+          <div class="pick-mid">
+            <div class="sm-signal buy" style="font-size:10px; padding:2px 8px;">BUY</div>
+            <div class="pick-horizon" style="margin-top:4px;">1–3 weeks</div>
+          </div>
+          <div style="text-align:right">
+            <div class="pick-score" style="color:var(--teal)">81%</div>
+            <div class="score-bar"><div class="score-fill" style="width:81%"></div></div>
+          </div>
+        </div>
+
+        <div class="pick-row">
+          <div>
+            <div class="pick-sym">UNH</div>
+            <div class="pick-name">UnitedHealth · Healthcare</div>
+          </div>
+          <div class="pick-mid">
+            <div class="sm-signal buy" style="font-size:10px; padding:2px 8px;">BUY</div>
+            <div class="pick-horizon" style="margin-top:4px;">3–6 weeks</div>
+          </div>
+          <div style="text-align:right">
+            <div class="pick-score" style="color:var(--teal)">76%</div>
+            <div class="score-bar"><div class="score-fill" style="width:76%"></div></div>
+          </div>
+        </div>
+
+        <div class="pick-row">
+          <div>
+            <div class="pick-sym">TSLA</div>
+            <div class="pick-name">Tesla · Auto/Tech</div>
+          </div>
+          <div class="pick-mid">
+            <div class="sm-signal short" style="font-size:10px; padding:2px 8px;">SHORT</div>
+            <div class="pick-horizon" style="margin-top:4px;">1–2 weeks</div>
+          </div>
+          <div style="text-align:right">
+            <div class="pick-score" style="color:var(--red-sig)">63%</div>
+            <div class="score-bar"><div class="score-fill" style="width:63%; background:var(--red-sig)"></div></div>
+          </div>
+        </div>
+
+        <a href="#pricing" style="display:inline-block; margin-top:16px; font-size:13px; color:var(--teal); text-decoration:none;">View all 14 signals →</a>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <p>⚠️ <strong>Important Disclosure:</strong> Holoture is an AI-powered information and education platform. All stock picks, signals, and market insights generated by Holoture are produced by artificial intelligence algorithms and are provided for informational and educational purposes only. Nothing on this platform constitutes personalized investment advice, financial planning, or a recommendation to buy or sell any security. Past signal accuracy is not indicative of future results. Investing involves risk, including potential loss of principal. Always conduct your own research and consult a qualified financial professional before making investment decisions. Holoture is not a registered investment advisor (RIA) with the SEC or any state regulator.</p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">Holo<span>ture</span></div>
+        <p>AI-generated stock signals for everyday investors. Transparent, affordable, and honest.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#">How It Works</a>
+        <a href="#">Signals</a>
+        <a href="#">Pricing</a>
+        <a href="#">Dashboard</a>
+        <a href="#">Mobile App</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Signal Track Record</a>
+        <a href="#">Careers</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">AI Disclosure</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">Not Financial Advice</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Holoture LLC. All rights reserved.</p>
+      <p>AI-powered signals · Not financial advice · holoture.com</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
